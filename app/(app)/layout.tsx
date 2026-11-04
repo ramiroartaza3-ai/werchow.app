@@ -5,7 +5,8 @@ import { cerrarSesion } from './actions'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const perfil = await getPerfil()
-  const conObjetivos = areasVisibles(perfil).filter((a) => INDICADORES[a])
+  const visibles = areasVisibles(perfil)
+  const conObjetivos = visibles.filter((a) => INDICADORES[a])
   const rol = ROLES.find((r) => r.clave === perfil.rol)?.nombre ?? perfil.rol
 
   return (
@@ -18,6 +19,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           {conObjetivos.map((a) => (
             <Link key={a} href={`/objetivos/${a}`}>{nombreArea(a)}</Link>
           ))}
+          {visibles.includes('sepelio') && (<>
+            <div className="grupo">Sepelio</div>
+            <Link href="/sepelio/procedimiento">Procedimiento</Link>
+            <Link href="/sepelio/calendario/turnos">Turnos</Link>
+            <Link href="/sepelio/calendario/guardias">Guardias</Link>
+          </>)}
           {perfil.rol === 'admin' && (<>
             <div className="grupo">Administración del sistema</div>
             <Link href="/admin/usuarios">Usuarios</Link>
