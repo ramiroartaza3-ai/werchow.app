@@ -1,5 +1,7 @@
-import { createServerClient } from '@supabase/ssr'
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+
+type CookieAGuardar = { name: string; value: string; options: CookieOptions }
 
 export function supabaseServer() {
   const cookieStore = cookies()
@@ -9,7 +11,7 @@ export function supabaseServer() {
     {
       cookies: {
         getAll: () => cookieStore.getAll(),
-        setAll: (list) => {
+        setAll: (list: CookieAGuardar[]) => {
           try {
             list.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
           } catch {
