@@ -1,2 +1,7 @@
 import { redirect } from 'next/navigation'
-export default function Inicio() { redirect('/panel') }
+import { getPerfil } from '@/lib/perfil'
+
+export default async function Inicio() {
+  const perfil = await getPerfil()
+  redirect(perfil.rol === 'usuario' ? '/inicio' : '/panel')
+}

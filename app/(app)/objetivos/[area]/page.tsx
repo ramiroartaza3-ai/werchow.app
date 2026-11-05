@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { supabaseServer } from '@/lib/supabase/server'
 import { getPerfil, areasVisibles } from '@/lib/perfil'
 import { INDICADORES, mesActual, nombreArea, puedeCargar, calcular, formatear } from '@/lib/indicadores'
@@ -6,6 +6,7 @@ import FormObjetivos from './FormObjetivos'
 
 export default async function Objetivos({ params, searchParams }: { params: { area: string }; searchParams: { mes?: string } }) {
   const perfil = await getPerfil()
+  if (perfil.rol === 'usuario') redirect('/inicio')
   const area = params.area
   if (!INDICADORES[area] || !areasVisibles(perfil).includes(area)) notFound()
 

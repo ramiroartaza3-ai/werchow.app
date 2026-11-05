@@ -6,7 +6,8 @@ import { cerrarSesion } from './actions'
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const perfil = await getPerfil()
   const visibles = areasVisibles(perfil)
-  const conObjetivos = visibles.filter((a) => INDICADORES[a])
+  const operativo = perfil.rol === 'usuario'
+  const conObjetivos = operativo ? [] : visibles.filter((a) => INDICADORES[a])
   const rol = ROLES.find((r) => r.clave === perfil.rol)?.nombre ?? perfil.rol
 
   return (
@@ -14,7 +15,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <aside className="lateral">
         <div className="marca">Werchow</div>
         <nav aria-label="Principal">
-          <Link href="/panel">Panel de objetivos</Link>
+          {operativo ? <Link href="/inicio">Inicio</Link> : <Link href="/panel">Panel de objetivos</Link>}
           {conObjetivos.length > 0 && <div className="grupo">Cargar objetivos</div>}
           {conObjetivos.map((a) => (
             <Link key={a} href={`/objetivos/${a}`}>{nombreArea(a)}</Link>
@@ -24,6 +25,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <Link href="/sepelio/procedimiento">Procedimiento</Link>
             <Link href="/sepelio/calendario/turnos">Turnos</Link>
             <Link href="/sepelio/calendario/guardias">Guardias</Link>
+          </>)}
+          {visibles.includes('ventas') && (<>
+            <div className="grupo">Ventas</div>
+            <Link href="/ventas/guia">Guía de gestión</Link>
+          </>)}
+          {visibles.includes('salud') && (<>
+            <div className="grupo">Salud</div>
+            <Link href="/salud/calendario">Horarios</Link>
           </>)}
           {perfil.rol === 'admin' && (<>
             <div className="grupo">Administración del sistema</div>

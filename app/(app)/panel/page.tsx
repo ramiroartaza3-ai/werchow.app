@@ -2,12 +2,14 @@ import { supabaseServer } from '@/lib/supabase/server'
 import { getPerfil, areasVisibles } from '@/lib/perfil'
 import { INDICADORES, calcular, formatear, mesActual, mesAnterior, nombreArea, type Fila } from '@/lib/indicadores'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 
 const nombreMes = (mes: string) =>
   new Date(`${mes}-15`).toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })
 
 export default async function Panel({ searchParams }: { searchParams: { mes?: string } }) {
   const perfil = await getPerfil()
+  if (perfil.rol === 'usuario') redirect('/inicio')
   const mes = /^\d{4}-\d{2}$/.test(searchParams.mes ?? '') ? searchParams.mes! : mesActual()
   const previo = mesAnterior(mes)
   const areas = areasVisibles(perfil).filter((a) => INDICADORES[a])

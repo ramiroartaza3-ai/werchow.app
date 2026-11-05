@@ -9,8 +9,8 @@ export type Asig = {
 type Dia = { fecha: string; etiqueta: string }
 type Form = { id?: number; fecha: string; persona: string; desde: string; hasta: string; es_cambio: boolean; observaciones: string }
 
-export default function Semana({ tipoDb, lunes, dias, hoy, asignaciones, editable, personas }: {
-  tipoDb: 'turno' | 'guardia'; lunes: string; dias: Dia[]; hoy: string
+export default function Semana({ area, tipoDb, lunes, dias, hoy, asignaciones, editable, personas }: {
+  area: 'sepelio' | 'salud'; tipoDb: 'turno' | 'guardia' | 'horario'; lunes: string; dias: Dia[]; hoy: string
   asignaciones: Asig[]; editable: boolean; personas: string[]
 }) {
   const vacio: Form = { fecha: dias[0].fecha, persona: '', desde: '08:00', hasta: '16:00', es_cambio: false, observaciones: '' }
@@ -30,7 +30,7 @@ export default function Semana({ tipoDb, lunes, dias, hoy, asignaciones, editabl
     e.preventDefault(); setMsg(null)
     start(async () => {
       const r = await guardarAsignacion({
-        id: f.id, tipo: tipoDb, fecha: f.fecha, persona: f.persona,
+        id: f.id, area, tipo: tipoDb, fecha: f.fecha, persona: f.persona,
         hora_desde: f.desde, hora_hasta: f.hasta, es_cambio: f.es_cambio, observaciones: f.observaciones,
       })
       setMsg({ ok: r.ok, texto: r.mensaje })
@@ -40,9 +40,9 @@ export default function Semana({ tipoDb, lunes, dias, hoy, asignaciones, editabl
 
   const quitar = (a: Asig) => {
     if (!window.confirm(`¿Quitar a ${a.persona} de este día?`)) return
-    start(async () => { const r = await borrarAsignacion(a.id, tipoDb); setMsg({ ok: r.ok, texto: r.mensaje }) })
+    start(async () => { const r = await borrarAsignacion(a.id, area, tipoDb); setMsg({ ok: r.ok, texto: r.mensaje }) })
   }
-  const copiar = () => start(async () => { const r = await copiarSemana(tipoDb, lunes); setMsg({ ok: r.ok, texto: r.mensaje }) })
+  const copiar = () => start(async () => { const r = await copiarSemana(area, tipoDb, lunes); setMsg({ ok: r.ok, texto: r.mensaje }) })
 
   return (
     <div aria-busy={pendiente}>
