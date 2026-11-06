@@ -7,6 +7,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const perfil = await getPerfil()
   const visibles = areasVisibles(perfil)
   const operativo = perfil.rol === 'usuario'
+  const esRrhh = perfil.rol === 'admin' || perfil.rol === 'rrhh'
   const conObjetivos = operativo ? [] : visibles.filter((a) => INDICADORES[a])
   const rol = ROLES.find((r) => r.clave === perfil.rol)?.nombre ?? perfil.rol
 
@@ -33,6 +34,20 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           {visibles.includes('salud') && (<>
             <div className="grupo">Salud</div>
             <Link href="/salud/calendario">Horarios</Link>
+          </>)}
+          {visibles.includes('administracion') && (<>
+            <div className="grupo">Administración</div>
+            <Link href="/rrhh/politicas">Políticas</Link>
+            <Link href="/rrhh/plan-carrera">Plan de carrera</Link>
+            <Link href="/rrhh/induccion">Planes de inducción</Link>
+            {esRrhh && (<>
+              <div className="grupo">Recursos humanos</div>
+              <Link href="/rrhh/legajos">Legajos</Link>
+              <Link href="/rrhh/busquedas">Búsquedas de personal</Link>
+              <Link href="/rrhh/rendimiento">Gestión del rendimiento</Link>
+              <Link href="/rrhh/memos">Memos y notificaciones</Link>
+              <Link href="/rrhh/minutas">Minutas de reunión</Link>
+            </>)}
           </>)}
           {perfil.rol === 'admin' && (<>
             <div className="grupo">Administración del sistema</div>

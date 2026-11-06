@@ -18,4 +18,8 @@ export const getPerfil = cache(async (): Promise<Perfil> => {
 })
 
 export const areasVisibles = (p: Perfil) =>
-  p.rol === 'admin' ? ['ventas', 'sepelio', 'administracion', 'salud'] : p.areas
+  p.rol === 'admin'
+    ? ['ventas', 'sepelio', 'administracion', 'salud']
+    : p.rol === 'rrhh' && !p.areas.includes('administracion')
+      ? [...p.areas, 'administracion']
+      : p.areas
