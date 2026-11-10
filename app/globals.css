@@ -1,0 +1,77 @@
+:root {
+  --tinta: #1c2b30;
+  --papel: #f5f7f6;
+  --superficie: #ffffff;
+  --acento: #1d6a67;
+  --acento-fuerte: #14504d;
+  --suave: #5b6b70;
+  --linea: #d8dfdd;
+  --error: #a63a2b;
+  --ok: #2c7a4b;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--papel); color: var(--tinta); font-size: 16px; line-height: 1.5; }
+a { color: var(--acento); }
+h1 { font-size: 1.6rem; margin: 0 0 .25rem; }
+h2 { font-size: 1.15rem; margin: 0 0 .75rem; }
+.suave { color: var(--suave); font-size: .9rem; }
+
+.shell { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+.lateral { background: var(--tinta); color: #e8efed; padding: 1.25rem 1rem; display: flex; flex-direction: column; gap: 1.25rem; }
+.lateral .marca { font-size: 1.25rem; font-weight: 700; letter-spacing: .02em; }
+.lateral nav { display: flex; flex-direction: column; gap: .15rem; }
+.lateral nav a { color: #cfdcd9; text-decoration: none; padding: .5rem .65rem; border-radius: 6px; }
+.lateral nav a:hover { background: rgba(255,255,255,.08); color: #fff; }
+.lateral .grupo { margin: .75rem 0 .25rem .65rem; font-size: .85rem; color: #8fa5a1; }
+.lateral .pie { margin-top: auto; font-size: .85rem; color: #9fb3af; }
+.lateral .pie button { margin-top: .5rem; }
+.contenido { padding: 1.75rem 2rem; max-width: 1100px; width: 100%; }
+
+button, .boton { font: inherit; cursor: pointer; border: 1px solid var(--acento); background: var(--acento); color: #fff; padding: .55rem 1rem; border-radius: 6px; }
+button:hover { background: var(--acento-fuerte); }
+button.secundario { background: transparent; color: var(--acento); }
+.lateral button.secundario { color: #cfdcd9; border-color: #4d6360; }
+button:disabled { opacity: .6; cursor: default; }
+input, select { font: inherit; padding: .5rem .6rem; border: 1px solid var(--linea); border-radius: 6px; background: #fff; width: 100%; }
+input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+label { display: block; font-size: .9rem; margin-bottom: .25rem; }
+.campo { margin-bottom: 1rem; }
+.fila-campos { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.mensaje-error { color: var(--error); }
+.mensaje-ok { color: var(--ok); }
+
+.barra { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.barra form { display: flex; gap: .5rem; align-items: center; }
+.barra input { width: auto; }
+
+.areas { display: grid; gap: 1.25rem; }
+.area { background: var(--superficie); border: 1px solid var(--linea); border-radius: 8px; padding: 1.25rem; }
+.area header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: .5rem; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: .55rem .5rem; border-bottom: 1px solid var(--linea); vertical-align: top; }
+th { font-weight: 600; font-size: .9rem; color: var(--suave); }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr:last-child td { border-bottom: 0; }
+.var { font-size: .85rem; color: var(--suave); }
+
+.grupo-ind { padding: 1rem 0; border-bottom: 1px solid var(--linea); }
+.grupo-ind:last-of-type { border-bottom: 0; }
+.vehiculo { display: grid; grid-template-columns: 1fr 1fr auto; gap: .5rem; margin-bottom: .5rem; }
+.checks { display: flex; gap: 1rem; flex-wrap: wrap; }
+.checks label { display: flex; gap: .35rem; align-items: center; margin: 0; }
+.checks input { width: auto; }
+
+.centro { min-height: 100vh; display: grid; place-items: center; padding: 1rem; }
+.tarjeta { background: var(--superficie); border: 1px solid var(--linea); border-radius: 8px; padding: 2rem; width: 100%; max-width: 400px; }
+.tarjeta .marca { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.25rem; }
+
+@media (max-width: 800px) {
+  .shell { grid-template-columns: 1fr; }
+  .lateral { flex-direction: row; flex-wrap: wrap; align-items: center; }
+  .lateral nav { flex-direction: row; flex-wrap: wrap; }
+  .lateral .pie { margin: 0; }
+  .contenido { padding: 1.25rem 1rem; }
+  .fila-campos { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
