@@ -1,47 +1,31 @@
-import { notFound, redirect } from 'next/navigation'
+import '../../sepelio/sepelio.css'
+import { redirect } from 'next/navigation'
 import { supabaseServer } from '@/lib/supabase/server'
-import { getPerfil, areasVisibles } from '@/lib/perfil'
-import { INDICADORES, mesActual, nombreArea, puedeCargar, calcular, formatear } from '@/lib/indicadores'
-import FormObjetivos from './FormObjetivos'
+import { getPerfil } from '@/lib/perfil'
+import FormUsuario from './FormUsuario'
+import ListaUsuarios, { type Usuario } from './ListaUsuarios'
 
-export default async function Objetivos({ params, searchParams }: { params: { area: string }; searchParams: { mes?: string } }) {
+export default async function Usuarios() {
   const perfil = await getPerfil()
-  if (perfil.rol === 'usuario') redirect('/inicio')
-  const area = params.area
-  if (!INDICADORES[area] || !areasVisibles(perfil).includes(area)) notFound()
+  if (perfil.rol !== 'admin') redirect('/panel')
 
-  const mes = /^\d{4}-\d{2}$/.test(searchParams.mes ?? '') ? searchParams.mes! : mesActual()
-  const editable = puedeCargar(perfil.rol, perfil.areas, area)
-
-  const { data } = await supabaseServer().from('objetivos_mensuales')
-    .select('indicador, detalle, valor').eq('area', area).eq('periodo', `${mes}-01`)
-  const filas = (data ?? []).map((f) => ({ ...f, valor: Number(f.valor) }))
+  const { data } = await supabaseServer().from('perfiles')
+    .select('id, email, nombre, rol, areas, activo').order('creado_en')
 
   return (
     <>
-      <div className="barra">
-        <div>
-          <h1>Objetivos de {nombreArea(area)}</h1>
-          <div className="suave">{editable ? 'Cargá los datos del mes.' : 'Solo lectura: la carga la hace el responsable del área.'}</div>
-        </div>
-        <form method="get">
-          <label htmlFor="mes" className="suave" style={{ margin: 0 }}>Mes</label>
-          <input id="mes" type="month" name="mes" defaultValue={mes} />
-          <button type="submit" className="secundario">Ver</button>
-        </form>
-      </div>
+      <div className="barra"><div><h1>Usuarios</h1>
+        <div className="suave">Los correos nuevos terminan siempre en @werchow.com.</div></div></div>
 
-      {editable ? (
-        <FormObjetivos key={`${area}-${mes}`} area={area} mes={mes} indicadores={INDICADORES[area]} filas={filas} />
-      ) : (
-        <table>
-          <tbody>
-            {INDICADORES[area].map((ind) => (
-              <tr key={ind.clave}><td>{ind.etiqueta}</td><td className="num">{formatear(ind, calcular(ind, filas))}</td></tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+      <section className="area" style={{ marginBottom: '1.5rem' }}>
+        <h2>Crear usuario</h2>
+        <FormUsuario />
+      </section>
+
+      <section className="area">
+        <h2>Usuarios del sistema</h2>
+        <ListaUsuarios usuarios={(data ?? []) as Usuario[]} yo={perfil.id} />
+      </section>
     </>
   )
 }

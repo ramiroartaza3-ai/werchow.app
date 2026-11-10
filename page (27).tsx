@@ -1,6 +1,6 @@
-import CalendarioSemanal from '@/components/calendario/CalendarioSemanal'
+import PaginaProcesos from '@/components/procesos/PaginaProcesos'
 
-export default function Horarios({ searchParams }: { searchParams: { semana?: string } }) {
-  return <CalendarioSemanal area="salud" tipoDb="horario" titulo="Horarios de la administración de Salud"
-    ayuda="Asignación semanal de horarios del personal administrativo." responsable="Salud" semana={searchParams.semana} />
+export default function Procedimiento() {
+  return <PaginaProcesos grupo="sepelio_procedimiento" titulo="Procedimiento administrativo de Sepelio"
+    ayuda="Paso a paso del servicio, desde la solicitud hasta el cierre." palabra="paso" permiteDecision />
 }

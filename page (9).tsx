@@ -1,76 +1,84 @@
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { redirect } from 'next/navigation'
 import { supabaseServer } from '@/lib/supabase/server'
-import { getPerfil, areasVisibles } from '@/lib/perfil'
-import { INDICADORES, calcular, formatear, mesActual, mesAnterior, nombreArea } from '@/lib/indicadores'
-import { mesValido, nombreMes } from '@/lib/reportes'
-import { cargarObjetivos, filasDe, detalleRatio } from '@/lib/objetivos-datos'
-import GraficosArea from '@/components/graficos/GraficosArea'
-import BotonImprimir from '@/components/graficos/BotonImprimir'
-import '../../panel/panel.css'
+import { getPerfil } from '@/lib/perfil'
+import { AREAS, INDICADORES, calcular, formatear, mesActual, mesAnterior, nombreArea, type Fila } from '@/lib/indicadores'
+import './inicio.css'
 
-export default async function ReporteObjetivos({ searchParams }: { searchParams: { area?: string; mes?: string } }) {
+// Accesos a la información de cada área
+const ACCESOS: Record<string, { href: string; texto: string }[]> = {
+  sepelio: [
+    { href: '/sepelio/procedimiento', texto: 'Procedimiento administrativo' },
+    { href: '/sepelio/calendario/turnos', texto: 'Turnos' },
+    { href: '/sepelio/calendario/guardias', texto: 'Guardias' },
+  ],
+  ventas: [
+    { href: '/ventas/guia', texto: 'Guía de gestión de ventas' },
+    { href: '/ventas/calendario/turnos', texto: 'Turnos' },
+    { href: '/ventas/calendario/guardias', texto: 'Guardias' },
+  ],
+  salud: [{ href: '/salud/calendario', texto: 'Horarios' }],
+  administracion: [
+    { href: '/rrhh/politicas', texto: 'Políticas de la empresa' },
+    { href: '/rrhh/plan-carrera', texto: 'Plan de carrera' },
+    { href: '/rrhh/induccion', texto: 'Planes de inducción' },
+  ],
+}
+
+const nombreMes = (mes: string) => new Date(`${mes}-15`).toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })
+
+export default async function Inicio() {
   const perfil = await getPerfil()
-  if (perfil.rol === 'usuario') notFound()
+  if (perfil.rol !== 'usuario') redirect('/panel')
 
-  const mes = mesValido(searchParams.mes) ? searchParams.mes : mesActual()
+  const areas = AREAS.map((a) => a.clave as string).filter((a) => perfil.areas.includes(a))
+  const conIndicadores = areas.filter((a) => INDICADORES[a])
+  const mes = mesActual()
   const previo = mesAnterior(mes)
-  const visibles = areasVisibles(perfil).filter((a) => INDICADORES[a])
-  const areas = searchParams.area ? visibles.filter((a) => a === searchParams.area) : visibles
-  if (!areas.length) notFound()
 
-  const { meses, datos } = await cargarObjetivos(supabaseServer(), areas, mes)
-  const qs = `${searchParams.area ? `area=${searchParams.area}&` : ''}mes=${mes}`
+  const { data } = conIndicadores.length
+    ? await supabaseServer().from('objetivos_mensuales')
+        .select('area, periodo, indicador, detalle, valor')
+        .in('periodo', [`${mes}-01`, `${previo}-01`]).in('area', conIndicadores)
+    : { data: [] }
+
+  const filas = (area: string, m: string): Fila[] =>
+    (data ?? []).filter((f) => f.area === area && f.periodo === `${m}-01`) as Fila[]
 
   return (
     <>
-      <div className="barra no-imprimir">
-        <div><h1>Reporte mensual de objetivos</h1><div className="suave">Podés descargarlo en Excel o guardarlo como PDF desde la impresión.</div></div>
-        <form method="get" style={{ display: 'flex', gap: '.5rem', alignItems: 'center' }}>
-          {searchParams.area && <input type="hidden" name="area" value={searchParams.area} />}
-          <label htmlFor="mes" className="suave" style={{ margin: 0 }}>Mes</label>
-          <input id="mes" type="month" name="mes" defaultValue={mes} />
-          <button type="submit" className="secundario">Ver</button>
-        </form>
-      </div>
-      <div className="acciones-rep no-imprimir" style={{ marginBottom: '1rem' }}>
-        <a href={`/reportes/objetivos/csv?${qs}`} download>Descargar Excel (CSV)</a>
-        <BotonImprimir />
-        <Link href={`/panel?mes=${mes}`}>Volver al panel</Link>
+      <div className="barra">
+        <div>
+          <h1>Hola{perfil.nombre ? `, ${perfil.nombre.split(' ')[0]}` : ''}</h1>
+          <div className="suave">Resumen informativo de {nombreMes(mes)}</div>
+        </div>
       </div>
 
-      <div className="encabezado-reporte">
-        <h1>Werchow · Reporte de objetivos</h1>
-        <div className="suave">{nombreMes(mes)}</div>
-      </div>
+      {areas.length === 0 && <p>Todavía no tenés áreas asignadas. Consultá con el administrador.</p>}
 
-      {areas.map((area) => (
-        <section className="area" key={area} style={{ marginBottom: '1.25rem' }}>
-          <h2>{nombreArea(area)}</h2>
-          <div className="ficha-tabla">
-            <table>
-              <thead><tr><th>Indicador</th><th className="num">{nombreMes(mes)}</th><th className="num">Mes anterior</th><th>Detalle</th></tr></thead>
-              <tbody>
-                {INDICADORES[area].map((ind) => {
-                  const actual = filasDe(datos, area, mes)
-                  const vehiculos = ind.porVehiculo
-                    ? actual.filter((f) => f.indicador === ind.clave && f.detalle).map((f) => `${f.detalle}: ${f.valor}`).join(' · ')
-                    : ''
-                  return (
-                    <tr key={ind.clave}>
-                      <td>{ind.etiqueta}</td>
-                      <td className="num">{formatear(ind, calcular(ind, actual))}</td>
-                      <td className="num var">{formatear(ind, calcular(ind, filasDe(datos, area, previo)))}</td>
-                      <td className="suave">{detalleRatio(ind, actual) || vehiculos}</td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-          <GraficosArea area={area} meses={meses} datos={datos} />
-        </section>
-      ))}
+      <div className="areas">
+        {areas.map((area) => (
+          <section className="area" key={area}>
+            <h2>{nombreArea(area)}</h2>
+            {INDICADORES[area] && (
+              <div className="resumen">
+                {INDICADORES[area].filter((i) => i.resumen).map((ind) => (
+                  <div className="dato" key={ind.clave}>
+                    <div className="valor">{formatear(ind, calcular(ind, filas(area, mes)))}</div>
+                    <div className="nombre">{ind.etiqueta}</div>
+                    <div className="previo">Mes anterior: {formatear(ind, calcular(ind, filas(area, previo)))}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {ACCESOS[area] && (
+              <nav className="accesos" aria-label={`Información de ${nombreArea(area)}`}>
+                {ACCESOS[area].map((a) => <Link key={a.href} href={a.href}>{a.texto}</Link>)}
+              </nav>
+            )}
+          </section>
+        ))}
+      </div>
     </>
   )
 }

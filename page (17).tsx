@@ -1,6 +1,6 @@
 import PaginaProcesos from '@/components/procesos/PaginaProcesos'
 
-export default function Induccion() {
-  return <PaginaProcesos grupo="rrhh_induccion" titulo="Planes de inducción"
-    ayuda="Qué tiene que conocer y hacer una persona al ingresar a cada sector." palabra="plan" />
+export default function GuiaVentas() {
+  return <PaginaProcesos grupo="ventas_guia" titulo="Guía de gestión de Ventas"
+    ayuda="Tipos de venta, materiales del vendedor y esquema de trabajo por modalidad." palabra="sección" />
 }

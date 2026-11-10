@@ -1,6 +1,6 @@
 import PaginaProcesos from '@/components/procesos/PaginaProcesos'
 
-export default function PlanCarrera() {
-  return <PaginaProcesos grupo="rrhh_plan_carrera" titulo="Plan de carrera"
-    ayuda="Puestos, niveles y recorridos de crecimiento dentro de la empresa." palabra="puesto o recorrido" />
+export default function Politicas() {
+  return <PaginaProcesos grupo="rrhh_politicas" titulo="Políticas de la empresa"
+    ayuda="Normas y políticas vigentes." palabra="política" />
 }
