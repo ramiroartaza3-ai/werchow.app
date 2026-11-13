@@ -1,0 +1,8 @@
+.resumen { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: .75rem; margin: .75rem 0 1rem; }
+.dato { border: 1px solid var(--linea); border-radius: 8px; padding: .75rem .9rem; background: var(--papel); }
+.dato .valor { font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.dato .nombre { font-size: .9rem; color: var(--suave); }
+.dato .previo { font-size: .8rem; color: var(--suave); margin-top: .2rem; }
+.accesos { display: flex; gap: .5rem; flex-wrap: wrap; }
+.accesos a { border: 1px solid var(--acento); border-radius: 6px; padding: .4rem .8rem; text-decoration: none; }
+.accesos a:hover { background: var(--acento); color: #fff; }
